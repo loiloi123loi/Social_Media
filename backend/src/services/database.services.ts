@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
-import { Db, MongoClient } from 'mongodb'
+import { Collection, Db, MongoClient } from 'mongodb'
+import User from '~/models/schemas/User.schemas'
 
 const isDevelopment = process.env.NODE_ENV || 'development'
 dotenv.config({ path: isDevelopment ? '.env.development' : '.env' })
@@ -25,6 +26,10 @@ class DatabaseService {
       console.error('MongoDB connection error:', error)
       throw error
     }
+  }
+
+  get users(): Collection<User> {
+    return this.db.collection<User>(process.env.DB_USERS_COLLECTION as string)
   }
 }
 
