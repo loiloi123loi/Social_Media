@@ -11,7 +11,12 @@ const USERS_MESSAGES = {
   PASSWORD_LENGTH_MUST_BE_FROM_1_TO_100: 'Password length must be from 1 to 100',
   PASSWORD_MUST_BE_STRONG: 'Password must be strong',
   REGISTER_USER_SUCCESS: 'User registered successfully',
-  LOGIN_USER_SUCCESS: 'Login successfully'
+  LOGIN_USER_SUCCESS: 'Login successfully',
+  REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
+  REFRESH_TOKEN_MUST_BE_A_STRING: 'Refresh token must be a string',
+  REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
+  USER_NOT_FOUND: 'User not found',
+  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully'
 } as const
 
 export { USERS_MESSAGES }

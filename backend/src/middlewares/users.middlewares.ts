@@ -1,7 +1,10 @@
 import { checkSchema } from 'express-validator'
+import { ObjectId } from 'mongodb'
+import { TOKEN_TYPE } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
 import userService from '~/services/users.services'
+import { verifyToken } from '~/utils/jwt.utils'
 import { validate } from '~/utils/validation.utils'
 
 export const registerValidator = validate(
@@ -101,6 +104,54 @@ export const loginValidator = validate(
             max: 100
           },
           errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_FROM_1_TO_100
+        }
+      }
+    },
+    ['body']
+  )
+)
+
+export const refreshTokenValidator = validate(
+  checkSchema(
+    {
+      refreshToken: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: USERS_MESSAGES.REFRESH_TOKEN_MUST_BE_A_STRING
+        },
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            try {
+              const tokenPayload = await verifyToken({
+                token: value,
+                secret: process.env.JWT_REFRESH_TOKEN_SECRET
+              })
+              console.log(tokenPayload)
+              const { userId, tokenType } = tokenPayload
+
+              if (tokenType !== TOKEN_TYPE.REFRESH_TOKEN) {
+                throw new Error(USERS_MESSAGES.REFRESH_TOKEN_IS_INVALID)
+              }
+
+              const user = await databaseService.users.findOne({
+                _id: new ObjectId(userId)
+              })
+
+              if (!user) {
+                throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+              }
+
+              req.user = user
+              req.decodedRefreshToken = tokenPayload
+              return true
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (err) {
+              throw new Error(USERS_MESSAGES.REFRESH_TOKEN_IS_INVALID)
+            }
+          }
         }
       }
     },
