@@ -1,0 +1,16 @@
+:root {
+  --color-background: #f9f9f9;
+  --color-background-soft: #ffffff;
+  --color-border: #ddd;
+  --color-border-hover: #4caf50;
+  --color-heading: #333;
+  --color-text: #555;
+  --color-primary: #4caf50;
+  --color-primary-hover: #45a049;
+  --color-button-text: #ffffff;
+  --color-danger: #dc3545;
+  --color-danger-hover: #c82333;
+  --color-warning: #ffc107;
+  --color-warning-hover: #e0a800;
+  --color-warning-text: #000;
+}
