@@ -8,3 +8,7 @@ export interface LoginUserReqBody {
   email: string
   password: string
 }
+
+export interface RefreshTokenReqBody {
+  refreshToken: string
+}

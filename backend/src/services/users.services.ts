@@ -4,7 +4,7 @@ import { RegisterUserReqBody } from '~/models/requests/User.requests'
 import User from '~/models/schemas/User.schemas'
 import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/bcrypt.utils'
-import { signToken } from '~/utils/jwt.utils'
+import { ITokenPayload, signToken } from '~/utils/jwt.utils'
 
 class UserService {
   private signAccessToken(userId: string) {
@@ -17,9 +17,15 @@ class UserService {
     })
   }
 
-  private signRefreshToken(userId: string) {
+  private signRefreshToken(payload: { userId: string; exp?: number }) {
+    if (payload.exp) {
+      return signToken({
+        payload: { ...payload, tokenType: TOKEN_TYPE.REFRESH_TOKEN },
+        secret: process.env.JWT_REFRESH_TOKEN_SECRET as string
+      })
+    }
     return signToken({
-      payload: { userId, tokenType: TOKEN_TYPE.REFRESH_TOKEN },
+      payload: { ...payload, tokenType: TOKEN_TYPE.REFRESH_TOKEN },
       secret: process.env.JWT_REFRESH_TOKEN_SECRET as string,
       options: {
         expiresIn: Number(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN)
@@ -27,8 +33,8 @@ class UserService {
     })
   }
 
-  private signAccessAndRefreshToken(userId: string) {
-    return Promise.all([this.signAccessToken(userId), this.signRefreshToken(userId)])
+  private signAccessAndRefreshToken(tokenPayload: { userId: string; exp?: number }) {
+    return Promise.all([this.signAccessToken(tokenPayload.userId), this.signRefreshToken(tokenPayload)])
   }
 
   async isExistEmail(email: string) {
@@ -43,7 +49,7 @@ class UserService {
 
     await databaseService.users.insertOne(new User({ _id: userId, name, email, password: hashedPassword }))
 
-    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(userId.toString())
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId: userId.toString() })
 
     return {
       accessToken,
@@ -52,7 +58,16 @@ class UserService {
   }
 
   async loginUser(userId: string) {
-    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(userId)
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId })
+
+    return {
+      accessToken,
+      refreshToken
+    }
+  }
+
+  async refreshToken(userId: string, tokenPayload: ITokenPayload) {
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId, exp: tokenPayload.exp })
 
     return {
       accessToken,
