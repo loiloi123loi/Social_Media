@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
+import { useThemeStore } from '@/stores/theme'
 import Toast from 'primevue/toast'
-import { useThemeStore } from './stores/theme'
 
 const themeStore = useThemeStore()
 themeStore.initTheme()

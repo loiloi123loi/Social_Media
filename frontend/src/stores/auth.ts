@@ -18,8 +18,6 @@ export const useAuthStore = defineStore('auth', () => {
   const addToken = (data: IAuthResponse) => {
     const { accessToken, refreshToken } = data
 
-    console.log(data)
-
     localStorage.setItem('accessToken', accessToken)
     localStorage.setItem('refreshToken', refreshToken)
     isAuthenticated.value = true
