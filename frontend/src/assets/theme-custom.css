@@ -1,0 +1,182 @@
+.p-toast {
+  opacity: 1;
+}
+
+.p-toast .p-toast-message {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+.p-toast .p-toast-message .p-toast-message-content {
+  border-width: 0;
+  gap: 0.75rem;
+}
+
+.p-toast .p-toast-message .p-toast-message-content .p-toast-message-icon {
+  font-size: 1.5rem;
+}
+
+.p-toast .p-toast-message .p-toast-message-content .p-toast-message-text {
+  flex: 1;
+  line-height: 1.5;
+}
+
+.p-toast .p-toast-message .p-toast-message-content .p-toast-summary {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.p-toast .p-toast-message .p-toast-message-content .p-toast-detail {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+:root {
+  --toast-error-bg: #fef2f2;
+  --toast-error-border: #dc2626;
+  --toast-error-text: #991b1b;
+  --toast-error-detail: #dc2626;
+
+  --toast-success-bg: #f0fdf4;
+  --toast-success-border: #16a34a;
+  --toast-success-text: #166534;
+  --toast-success-detail: #15803d;
+
+  --toast-info-bg: #eff6ff;
+  --toast-info-border: #3b82f6;
+  --toast-info-text: #1e40af;
+  --toast-info-detail: #1d4ed8;
+
+  --toast-warning-bg: #fffbeb;
+  --toast-warning-border: #f59e0b;
+  --toast-warning-text: #92400e;
+  --toast-warning-detail: #b45309;
+}
+
+:root.dark {
+  --toast-error-bg: #450a0a;
+  --toast-error-border: #dc2626;
+  --toast-error-text: #fca5a5;
+  --toast-error-detail: #fecaca;
+
+  --toast-success-bg: #052e16;
+  --toast-success-border: #16a34a;
+  --toast-success-text: #86efac;
+  --toast-success-detail: #bbf7d0;
+
+  --toast-info-bg: #172554;
+  --toast-info-border: #3b82f6;
+  --toast-info-text: #93c5fd;
+  --toast-info-detail: #bfdbfe;
+
+  --toast-warning-bg: #451a03;
+  --toast-warning-border: #f59e0b;
+  --toast-warning-text: #fdba74;
+  --toast-warning-detail: #fed7aa;
+}
+
+.p-toast .p-toast-message.p-toast-message-error {
+  background: var(--toast-error-bg);
+  border-left: 4px solid var(--toast-error-border);
+}
+
+.p-toast .p-toast-message.p-toast-message-error .p-toast-detail {
+  color: var(--toast-error-detail);
+}
+
+.p-toast .p-toast-message.p-toast-message-success {
+  background: var(--toast-success-bg);
+  border-left: 4px solid var(--toast-success-border);
+}
+
+.p-toast .p-toast-message.p-toast-message-success .p-toast-message-text {
+  color: var(--toast-success-text);
+}
+
+.p-toast .p-toast-message.p-toast-message-success .p-toast-message-text .p-toast-detail {
+  color: var(--toast-success-detail);
+}
+
+.p-toast .p-toast-message.p-toast-message-error {
+  background: var(--toast-error-bg);
+  border-left: 4px solid var(--toast-error-border);
+}
+
+.p-toast .p-toast-message.p-toast-message-error .p-toast-message-text {
+  color: var(--toast-error-text);
+}
+
+.p-toast .p-toast-message.p-toast-message-error .p-toast-message-text .p-toast-detail {
+  color: var(--toast-error-detail);
+}
+
+.p-toast .p-toast-message .p-toast-message-content .p-icon {
+  color: currentColor;
+}
+
+.p-toast .p-toast-message .p-toast-close-button {
+  background: transparent;
+  border: none;
+  color: currentColor;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.p-toast .p-toast-message .p-toast-close-button:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.p-toast .p-toast-message.p-toast-message-exit-active {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.p-toast .p-toast-message.p-toast-message-info {
+  background: var(--toast-info-bg);
+  border-left: 4px solid var(--toast-info-border);
+}
+
+.p-toast .p-toast-message.p-toast-message-info .p-toast-message-text {
+  color: var(--toast-info-text);
+}
+
+.p-toast .p-toast-message.p-toast-message-info .p-toast-message-text .p-toast-detail {
+  color: var(--toast-info-detail);
+}
+
+.p-toast .p-toast-message.p-toast-message-warn {
+  background: var(--toast-warning-bg);
+  border-left: 4px solid var(--toast-warning-border);
+}
+
+.p-toast .p-toast-message.p-toast-message-warn .p-toast-message-text {
+  color: var(--toast-warning-text);
+}
+
+.p-toast .p-toast-message.p-toast-message-warn .p-toast-message-text .p-toast-detail {
+  color: var(--toast-warning-detail);
+}

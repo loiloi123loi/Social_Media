@@ -5,6 +5,7 @@
       <p class="subtitle">Join us and start your journey</p>
       <form @submit.prevent="handleSubmit" novalidate>
         <InputField
+          ref="nameRef"
           label="Name"
           v-model="form.name"
           type="text"
@@ -15,6 +16,7 @@
           @validate="validateField('name')"
         />
         <InputField
+          ref="emailRef"
           label="Email"
           v-model="form.email"
           type="email"
@@ -25,6 +27,7 @@
           @validate="validateField('email')"
         />
         <InputField
+          ref="passwordRef"
           label="Password"
           v-model="form.password"
           placeholder="Enter your password"
@@ -37,6 +40,7 @@
           @validate="validateField('password')"
         />
         <InputField
+          ref="confirmPasswordRef"
           label="Confirm Password"
           v-model="form.confirmPassword"
           placeholder="Enter your confirm password"
@@ -62,6 +66,7 @@ import type { IRegisterRequestData } from '@/api/auth'
 import Button from '@/components/Button.vue'
 import InputField from '@/components/InputField.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -73,12 +78,24 @@ interface IFormErrors {
 }
 
 const router = useRouter()
+const toast = useToast()
 const form = ref<IRegisterRequestData>({ name: '', email: '', password: '', confirmPassword: '' })
 const errors = ref<IFormErrors>({})
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const { register } = useAuthStore()
-const nameInput = ref<InstanceType<typeof InputField> | null>(null)
+
+const nameRef = ref<InstanceType<typeof InputField> | null>(null)
+const emailRef = ref<InstanceType<typeof InputField> | null>(null)
+const passwordRef = ref<InstanceType<typeof InputField> | null>(null)
+const confirmPasswordRef = ref<InstanceType<typeof InputField> | null>(null)
+
+const fieldRefs = {
+  name: nameRef,
+  email: emailRef,
+  password: passwordRef,
+  confirmPassword: confirmPasswordRef,
+}
 
 const validateField = (field: keyof IRegisterRequestData) => {
   errors.value[field] = ''
@@ -116,7 +133,7 @@ const validateField = (field: keyof IRegisterRequestData) => {
 
 const validateForm = () => {
   let isValid = true
-  const fields: (keyof IRegisterRequestData)[] = ['name', 'email', 'password']
+  const fields: (keyof IRegisterRequestData)[] = ['name', 'email', 'password', 'confirmPassword']
 
   fields.forEach((field) => {
     validateField(field)
@@ -127,8 +144,8 @@ const validateForm = () => {
 
   if (!isValid) {
     const firstErrorField = fields.find((field) => errors.value[field])
-    if (firstErrorField === 'name' && nameInput.value) {
-      nameInput.value.focus()
+    if (firstErrorField) {
+      fieldRefs[firstErrorField]?.value?.focus()
     }
   }
 
@@ -140,7 +157,31 @@ const handleSubmit = async () => {
     return
   }
 
-  await register(form.value)
+  const response = await register(form.value)
+
+  if (!response.isSuccess) {
+    const respError = response.errors
+    if (respError) {
+      toast.add({
+        severity: 'error',
+        summary: 'Register Failed',
+        detail: Object.keys(respError)
+          .map((key) => respError[key].msg)
+          .join(', '),
+        life: 3000,
+        group: 'tr',
+      })
+    }
+    return
+  }
+
+  toast.add({
+    severity: 'success',
+    summary: 'Success',
+    detail: response.message,
+    life: 3000,
+    group: 'tr',
+  })
   router.push({ name: 'Home' })
 }
 </script>
