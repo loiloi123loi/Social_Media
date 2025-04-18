@@ -64,8 +64,6 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const { isAuthenticated } = useAuthStore()
 
-  console.log(to)
-
   if (to.meta.authRequire && !isAuthenticated) {
     next({ name: 'Login' })
   } else if (isAuthenticated && ['/login', '/register'].includes(to.path)) {
