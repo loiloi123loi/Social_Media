@@ -4,6 +4,7 @@ import { TOKEN_TYPE } from '~/constants/enum'
 import { USERS_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
 import userService from '~/services/users.services'
+import { comparePassword } from '~/utils/bcrypt.utils'
 import { verifyToken } from '~/utils/jwt.utils'
 import { validate } from '~/utils/validation.utils'
 
@@ -83,6 +84,10 @@ export const loginValidator = validate(
           options: async (value, { req }) => {
             const user = await databaseService.users.findOne({ email: value })
             if (!user) {
+              throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
+            }
+            const isMatch = await comparePassword(req.body.password, user.password)
+            if (!isMatch) {
               throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
             }
             req.user = user

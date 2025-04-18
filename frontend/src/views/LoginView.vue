@@ -5,6 +5,7 @@
       <p class="subtitle">Login to access your account</p>
       <form @submit.prevent="handleLogin" novalidate>
         <InputField
+          ref="emailRef"
           label="Email"
           v-model="form.email"
           type="email"
@@ -15,6 +16,7 @@
           @validate="validateField('email')"
         />
         <InputField
+          ref="passwordRef"
           label="Password"
           v-model="form.password"
           placeholder="Enter your password"
@@ -40,6 +42,7 @@ import type { ILoginRequestData } from '@/api/auth'
 import Button from '@/components/Button.vue'
 import InputField from '@/components/InputField.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -49,10 +52,19 @@ interface IFormErrors {
 }
 
 const router = useRouter()
+const toast = useToast()
 const form = ref<ILoginRequestData>({ email: '', password: '' })
 const errors = ref<IFormErrors>({})
 const showPassword = ref(false)
 const { login } = useAuthStore()
+
+const emailRef = ref<InstanceType<typeof InputField> | null>(null)
+const passwordRef = ref<InstanceType<typeof InputField> | null>(null)
+
+const fieldRefs = {
+  email: emailRef,
+  password: passwordRef,
+}
 
 const validateField = (field: keyof ILoginRequestData) => {
   errors.value[field] = ''
@@ -73,8 +85,56 @@ const validateField = (field: keyof ILoginRequestData) => {
   }
 }
 
+const validateForm = () => {
+  let isValid = true
+  const fields: (keyof ILoginRequestData)[] = ['email', 'password']
+
+  fields.forEach((field) => {
+    validateField(field)
+    if (errors.value[field]) {
+      isValid = false
+    }
+  })
+
+  if (!isValid) {
+    const firstErrorField = fields.find((field) => errors.value[field])
+    if (firstErrorField) {
+      fieldRefs[firstErrorField]?.value?.focus()
+    }
+  }
+
+  return isValid
+}
+
 const handleLogin = async () => {
-  await login(form.value)
+  if (!validateForm()) {
+    return
+  }
+  const response = await login(form.value)
+
+  if (!response.isSuccess) {
+    const respError = response.errors
+    if (respError) {
+      toast.add({
+        severity: 'error',
+        summary: 'Login Failed',
+        detail: Object.keys(respError)
+          .map((key) => respError[key].msg)
+          .join(', '),
+        life: 3000,
+        group: 'tr',
+      })
+    }
+    return
+  }
+
+  toast.add({
+    severity: 'success',
+    summary: 'Success',
+    detail: response.message,
+    life: 3000,
+    group: 'tr',
+  })
   router.push({ name: 'Home' })
 }
 </script>

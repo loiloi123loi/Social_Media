@@ -116,6 +116,7 @@ label {
   border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 0.5rem;
+  background-color: var(--color-background);
 }
 
 input {
@@ -124,6 +125,9 @@ input {
   outline: none;
   padding: 0.5rem;
   font-size: 1rem;
+  background-color: transparent;
+  color: var(--color-text);
+  caret-color: var(--color-text);
 }
 
 input:focus {
@@ -132,6 +136,15 @@ input:focus {
 
 input[type='password']::-ms-reveal {
   display: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--color-background) inset !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .icon {
