@@ -60,9 +60,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = () => {
-    localStorage.clear()
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     isAuthenticated.value = false
     user.value = null
+    window.location.href = '/login'
   }
 
   return {

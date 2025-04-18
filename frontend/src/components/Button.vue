@@ -1,6 +1,12 @@
 <template>
   <button :type="type" :class="['btn', variant]" v-bind="$attrs" @click="onClick">
+    <span v-if="prefixIcon" class="icon prefix-icon">
+      <i :class="`pi ${prefixIcon}`" />
+    </span>
     {{ label }}
+    <span v-if="suffixIcon" class="icon suffix-icon">
+      <i :class="`pi ${suffixIcon}`" />
+    </span>
   </button>
 </template>
 
@@ -23,6 +29,14 @@ defineProps({
   onClick: {
     type: Function as PropType<() => void>,
     default: () => {},
+  },
+  prefixIcon: {
+    type: String,
+    default: null,
+  },
+  suffixIcon: {
+    type: String,
+    default: null,
   },
 })
 </script>

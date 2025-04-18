@@ -158,6 +158,12 @@ const handleLogin = async () => {
   text-align: center;
 }
 
+.form-wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 h1 {
   margin-bottom: 1rem;
   color: var(--color-heading);

@@ -1,6 +1,6 @@
-import '@/assets/main.css'
-import '@/assets/theme-custom.css'
-import '@/assets/theme.css'
+import '@/assets/styles/main.css'
+import '@/assets/styles/theme-custom.css'
+import '@/assets/styles/theme.css'
 import 'primeicons/primeicons.css'
 
 import App from '@/App.vue'

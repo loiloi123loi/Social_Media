@@ -14,9 +14,40 @@ const routes = [
   },
   {
     path: '/',
-    name: 'Home',
-    component: () => import('@/views/HomeView.vue'),
+    component: () => import('@/layouts/DashboardLayout.vue'),
     meta: { authRequire: true },
+    children: [
+      {
+        path: '/',
+        name: 'Home',
+        component: () => import('@/views/dashboard/NewsFeedView.vue'),
+      },
+      {
+        path: 'friends',
+        name: 'Friends',
+        component: () => import('@/views/dashboard/FriendsView.vue'),
+      },
+      {
+        path: 'videos',
+        name: 'Videos',
+        component: () => import('@/views/dashboard/VideosView.vue'),
+      },
+      {
+        path: 'messages',
+        name: 'Messages',
+        component: () => import('@/views/dashboard/MessagesView.vue'),
+      },
+      {
+        path: 'groups',
+        name: 'Groups',
+        component: () => import('@/views/dashboard/GroupsView.vue'),
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('@/views/dashboard/SettingsView.vue'),
+      },
+    ],
   },
   {
     path: '/:pathMatch(.*)*',
@@ -33,8 +64,12 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const { isAuthenticated } = useAuthStore()
 
+  console.log(to)
+
   if (to.meta.authRequire && !isAuthenticated) {
     next({ name: 'Login' })
+  } else if (isAuthenticated && ['/login', '/register'].includes(to.path)) {
+    next({ name: 'Home' })
   } else {
     next()
   }
