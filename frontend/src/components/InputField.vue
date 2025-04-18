@@ -1,6 +1,6 @@
 <template>
   <div class="form-group">
-    <label :for="id">{{ label }}</label>
+    <label v-if="label" :for="id">{{ label }}</label>
     <div :class="['input-wrapper', { error: errorMessage }]">
       <span v-if="prefixIcon" class="icon prefix-icon">
         <i :class="`pi ${prefixIcon}`" />
@@ -29,7 +29,6 @@ import { ref } from 'vue'
 defineProps({
   label: {
     type: String,
-    required: true,
   },
   modelValue: {
     type: String,
@@ -99,7 +98,6 @@ defineExpose({ focus })
 
 <style scoped>
 .form-group {
-  margin-bottom: 1rem;
   text-align: left;
 }
 
@@ -153,14 +151,6 @@ input:-webkit-autofill:active {
   justify-content: center;
   padding: 0 0.5rem;
   cursor: pointer;
-}
-
-.prefix-icon {
-  margin-right: 0.5rem;
-}
-
-.suffix-icon {
-  margin-left: 0.5rem;
 }
 
 .input-wrapper.error {
