@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken'
-import { TOKEN_TYPE } from '~/constants/enum'
+import { TOKEN_TYPE, USER_VERIFY_STATUS } from '~/constants/enum'
 
 export interface ITokenPayload extends jwt.JwtPayload {
   userId: string
+  verifyStatus: USER_VERIFY_STATUS
   tokenType: TOKEN_TYPE
   iat: number
   exp: number

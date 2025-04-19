@@ -18,7 +18,7 @@ export const registerController = async (
 }
 
 export const loginController = async (req: Request<ParamsDictionary, unknown, LoginUserReqBody>, res: Response) => {
-  const result = await userService.loginUser(req.user!._id.toString())
+  const result = await userService.loginUser({ userId: req.user!._id.toString(), verifyStatus: req.user!.verifyStatus })
 
   res.status(HTTP_STATUS.OK).json({
     message: USERS_MESSAGES.LOGIN_USER_SUCCESS,

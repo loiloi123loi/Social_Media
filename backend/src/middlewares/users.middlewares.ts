@@ -1,11 +1,14 @@
+import { NextFunction, Request, Response } from 'express'
 import { checkSchema } from 'express-validator'
 import { ObjectId } from 'mongodb'
-import { TOKEN_TYPE } from '~/constants/enum'
+import { TOKEN_TYPE, USER_VERIFY_STATUS } from '~/constants/enum'
+import HTTP_STATUS from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
+import { ErrorWithStatus } from '~/models/Error'
 import databaseService from '~/services/database.services'
 import userService from '~/services/users.services'
 import { comparePassword } from '~/utils/bcrypt.utils'
-import { verifyToken } from '~/utils/jwt.utils'
+import { ITokenPayload, verifyToken } from '~/utils/jwt.utils'
 import { validate } from '~/utils/validation.utils'
 
 export const registerValidator = validate(
@@ -134,7 +137,6 @@ export const refreshTokenValidator = validate(
                 token: value,
                 secret: process.env.JWT_REFRESH_TOKEN_SECRET
               })
-              console.log(tokenPayload)
               const { userId, tokenType } = tokenPayload
 
               if (tokenType !== TOKEN_TYPE.REFRESH_TOKEN) {
@@ -163,3 +165,64 @@ export const refreshTokenValidator = validate(
     ['body']
   )
 )
+
+export const accessTokenValidator = validate(
+  checkSchema(
+    {
+      Authorization: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED
+        },
+        isString: {
+          errorMessage: USERS_MESSAGES.ACCESS_TOKEN_MUST_BE_A_STRING
+        },
+        custom: {
+          options: async (value, { req }) => {
+            try {
+              value = value.replace('Bearer ', '').trim()
+              const tokenPayload = await verifyToken({
+                token: value,
+                secret: process.env.JWT_ACCESS_TOKEN_SECRET
+              })
+
+              const { userId, tokenType } = tokenPayload
+
+              if (tokenType !== TOKEN_TYPE.ACCESS_TOKEN) {
+                throw new Error(USERS_MESSAGES.ACCESS_TOKEN_IS_INVALID)
+              }
+
+              const user = await databaseService.users.findOne({
+                _id: new ObjectId(userId)
+              })
+
+              if (!user) {
+                throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+              }
+
+              req.user = user
+              req.decodedAccessToken = tokenPayload
+              return true
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error) {
+              throw new Error(USERS_MESSAGES.ACCESS_TOKEN_IS_INVALID)
+            }
+          }
+        }
+      }
+    },
+    ['headers']
+  )
+)
+
+export const verifiedUserValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decodedAccessToken as ITokenPayload
+  if (verify !== USER_VERIFY_STATUS.VERIFIED) {
+    return next(
+      new ErrorWithStatus({
+        message: USERS_MESSAGES.USER_NOT_VERIFIED,
+        status: HTTP_STATUS.FORBIDDEN
+      })
+    )
+  }
+  next()
+}

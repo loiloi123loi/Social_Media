@@ -16,7 +16,16 @@ const USERS_MESSAGES = {
   REFRESH_TOKEN_MUST_BE_A_STRING: 'Refresh token must be a string',
   REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
   USER_NOT_FOUND: 'User not found',
-  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully'
+  REFRESH_TOKEN_SUCCESS: 'Refresh token successfully',
+  ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
+  ACCESS_TOKEN_MUST_BE_A_STRING: 'Access token must be a string',
+  ACCESS_TOKEN_IS_INVALID: 'Access token is invalid',
+  USER_NOT_VERIFIED: 'User not verified'
 } as const
 
-export { USERS_MESSAGES }
+const COMMONS_MESSAGES = {
+  LIMIT_INVALID: 'Limit must be an integer greater than 0',
+  PAGE_INVALID: 'Page must be an integer greater than 0'
+}
+
+export { COMMONS_MESSAGES, USERS_MESSAGES }

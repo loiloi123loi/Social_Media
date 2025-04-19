@@ -5,5 +5,6 @@ declare module 'express' {
   export interface Request {
     user?: User
     decodedRefreshToken?: ITokenPayload
+    decodedAccessToken?: ITokenPayload
   }
 }

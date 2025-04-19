@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { TOKEN_TYPE } from '~/constants/enum'
+import { TOKEN_TYPE, USER_VERIFY_STATUS } from '~/constants/enum'
 import { RegisterUserReqBody } from '~/models/requests/User.requests'
 import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import User from '~/models/schemas/User.schemas'
@@ -8,9 +8,9 @@ import { hashPassword } from '~/utils/bcrypt.utils'
 import { ITokenPayload, signToken, verifyToken } from '~/utils/jwt.utils'
 
 class UserService {
-  private signAccessToken(userId: string) {
+  private signAccessToken({ userId, verifyStatus }: { userId: string; verifyStatus: USER_VERIFY_STATUS }) {
     return signToken({
-      payload: { userId, tokenType: TOKEN_TYPE.ACCESS_TOKEN },
+      payload: { userId, verifyStatus, tokenType: TOKEN_TYPE.ACCESS_TOKEN },
       secret: process.env.JWT_ACCESS_TOKEN_SECRET as string,
       options: {
         expiresIn: Number(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN)
@@ -18,15 +18,23 @@ class UserService {
     })
   }
 
-  private signRefreshToken(payload: { userId: string; exp?: number }) {
-    if (payload.exp) {
+  private signRefreshToken({
+    userId,
+    verifyStatus,
+    exp
+  }: {
+    userId: string
+    verifyStatus: USER_VERIFY_STATUS
+    exp?: number
+  }) {
+    if (exp) {
       return signToken({
-        payload: { ...payload, tokenType: TOKEN_TYPE.REFRESH_TOKEN },
+        payload: { userId, verifyStatus, tokenType: TOKEN_TYPE.REFRESH_TOKEN },
         secret: process.env.JWT_REFRESH_TOKEN_SECRET as string
       })
     }
     return signToken({
-      payload: { ...payload, tokenType: TOKEN_TYPE.REFRESH_TOKEN },
+      payload: { userId, verifyStatus, tokenType: TOKEN_TYPE.REFRESH_TOKEN },
       secret: process.env.JWT_REFRESH_TOKEN_SECRET as string,
       options: {
         expiresIn: Number(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN)
@@ -34,8 +42,8 @@ class UserService {
     })
   }
 
-  private signAccessAndRefreshToken(tokenPayload: { userId: string; exp?: number }) {
-    return Promise.all([this.signAccessToken(tokenPayload.userId), this.signRefreshToken(tokenPayload)])
+  private signAccessAndRefreshToken(tokenPayload: { userId: string; verifyStatus: USER_VERIFY_STATUS; exp?: number }) {
+    return Promise.all([this.signAccessToken(tokenPayload), this.signRefreshToken(tokenPayload)])
   }
 
   async isExistEmail(email: string) {
@@ -48,8 +56,19 @@ class UserService {
     const userId = new ObjectId()
     const hashedPassword = await hashPassword(password)
 
-    await databaseService.users.insertOne(new User({ _id: userId, name, email, password: hashedPassword }))
-    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId: userId.toString() })
+    await databaseService.users.insertOne(
+      new User({
+        _id: userId,
+        name,
+        email,
+        password: hashedPassword,
+        verifyStatus: USER_VERIFY_STATUS.UNVERIFIED
+      })
+    )
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      userId: userId.toString(),
+      verifyStatus: USER_VERIFY_STATUS.UNVERIFIED
+    })
 
     const { iat, exp } = await verifyToken({
       token: refreshToken,
@@ -70,8 +89,11 @@ class UserService {
     }
   }
 
-  async loginUser(userId: string) {
-    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId })
+  async loginUser({ userId, verifyStatus }: { userId: string; verifyStatus: USER_VERIFY_STATUS }) {
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      userId,
+      verifyStatus
+    })
 
     const { iat, exp } = await verifyToken({
       token: refreshToken,
@@ -93,7 +115,11 @@ class UserService {
   }
 
   async refreshToken(userId: string, tokenPayload: ITokenPayload) {
-    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId, exp: tokenPayload.exp })
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({
+      userId,
+      verifyStatus: tokenPayload.verifyStatus,
+      exp: tokenPayload.exp
+    })
 
     return {
       accessToken,
