@@ -1,10 +1,11 @@
 import { ObjectId } from 'mongodb'
 import { TOKEN_TYPE } from '~/constants/enum'
 import { RegisterUserReqBody } from '~/models/requests/User.requests'
+import RefreshToken from '~/models/schemas/RefreshToken.schemas'
 import User from '~/models/schemas/User.schemas'
 import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/bcrypt.utils'
-import { ITokenPayload, signToken } from '~/utils/jwt.utils'
+import { ITokenPayload, signToken, verifyToken } from '~/utils/jwt.utils'
 
 class UserService {
   private signAccessToken(userId: string) {
@@ -48,8 +49,20 @@ class UserService {
     const hashedPassword = await hashPassword(password)
 
     await databaseService.users.insertOne(new User({ _id: userId, name, email, password: hashedPassword }))
-
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId: userId.toString() })
+
+    const { iat, exp } = await verifyToken({
+      token: refreshToken,
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET
+    })
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        userId: new ObjectId(userId),
+        token: refreshToken,
+        iat,
+        exp
+      })
+    )
 
     return {
       accessToken,
@@ -59,6 +72,19 @@ class UserService {
 
   async loginUser(userId: string) {
     const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ userId })
+
+    const { iat, exp } = await verifyToken({
+      token: refreshToken,
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET
+    })
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        userId: new ObjectId(userId),
+        token: refreshToken,
+        iat,
+        exp
+      })
+    )
 
     return {
       accessToken,

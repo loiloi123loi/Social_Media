@@ -4,6 +4,8 @@ import { TOKEN_TYPE } from '~/constants/enum'
 export interface ITokenPayload extends jwt.JwtPayload {
   userId: string
   tokenType: TOKEN_TYPE
+  iat: number
+  exp: number
 }
 
 export const signToken = ({
@@ -13,7 +15,7 @@ export const signToken = ({
     algorithm: 'HS256'
   }
 }: {
-  payload: ITokenPayload
+  payload: object
   secret?: string
   options?: jwt.SignOptions
 }) => {
