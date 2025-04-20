@@ -1,5 +1,5 @@
 import { checkSchema } from 'express-validator'
-import { MEDIA_TYPE_QUERY } from '~/constants/enum'
+import { MEDIA_TYPE } from '~/constants/enum'
 import { validate } from '~/utils/validation.utils'
 
 export const searchValidator = validate(
@@ -13,9 +13,9 @@ export const searchValidator = validate(
       mediaType: {
         optional: true,
         isIn: {
-          options: [Object.values(MEDIA_TYPE_QUERY)]
+          options: [Object.values(MEDIA_TYPE)]
         },
-        errorMessage: `Invalid media type must be one of ${Object.values(MEDIA_TYPE_QUERY).join(', ')}`
+        errorMessage: `Invalid media type must be one of ${Object.values(MEDIA_TYPE).join(', ')}`
       },
       peopleFollow: {
         optional: true,

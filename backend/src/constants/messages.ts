@@ -28,4 +28,19 @@ const COMMONS_MESSAGES = {
   PAGE_INVALID: 'Page must be an integer greater than 0'
 }
 
-export { COMMONS_MESSAGES, USERS_MESSAGES }
+const POSTS_MESSAGES = {
+  POST_TYPE_IS_REQUIRED: 'Post type is required',
+  POST_TYPE_MUST_BE_A_STRING: 'Post type must be a string',
+  POST_TYPE_INVALID: 'Post type must be one of ',
+  AUDIENCE_IS_REQUIRED: 'Audience is required',
+  AUDIENCE_MUST_BE_A_STRING: 'Audience must be a string',
+  AUDIENCE_INVALID: 'Audience must be one of ',
+  PARENT_ID_MUST_BE_A_VALID_POST_ID: 'Parent ID must be a valid post ID',
+  PARENT_ID_MUST_BE_NULL: 'Parent ID must be null',
+  CONTENT_MUST_BE_A_NON_EMPTY_STRING: 'Content must be a non-empty string',
+  CONTENT_MUST_BE_EMPTY_STRING: 'Content must be an empty string',
+  MEDIAS_MUST_BE_AN_ARRAY_OF_MEDIA_OBJECT: 'Medias must be an array of media object',
+  CREATE_POST_SUCCESS: 'Create post successfully'
+}
+
+export { COMMONS_MESSAGES, POSTS_MESSAGES, USERS_MESSAGES }
