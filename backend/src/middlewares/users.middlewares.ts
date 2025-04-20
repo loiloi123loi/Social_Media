@@ -215,8 +215,8 @@ export const accessTokenValidator = validate(
 )
 
 export const verifiedUserValidator = (req: Request, res: Response, next: NextFunction) => {
-  const { verify } = req.decodedAccessToken as ITokenPayload
-  if (verify !== USER_VERIFY_STATUS.VERIFIED) {
+  const { verifyStatus } = req.decodedAccessToken as ITokenPayload
+  if (verifyStatus !== USER_VERIFY_STATUS.VERIFIED) {
     return next(
       new ErrorWithStatus({
         message: USERS_MESSAGES.USER_NOT_VERIFIED,
