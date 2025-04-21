@@ -30,7 +30,7 @@ import Sidebar from '@/components/dashboard/Sidebar.vue'
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   background-color: var(--color-background-soft);
 }
 </style>

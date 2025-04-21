@@ -10,7 +10,7 @@
         :class="['menu-item', { active: item.to === $route.path }]"
         @click="navigateTo(item.to)"
       >
-        <i :class="['menu-icon', item.icon]" />
+        <i :class="['menu-icon', 'pi', item.icon]" />
         <span class="menu-text">{{ item.label }}</span>
       </li>
     </ul>
@@ -21,12 +21,12 @@
 import { useRouter } from 'vue-router'
 
 const items = [
-  { label: 'News Feed', icon: 'pi pi-home', to: '/' },
-  { label: 'Friends', icon: 'pi pi-users', to: '/friends' },
-  { label: 'Videos', icon: 'pi pi-video', to: '/videos' },
-  { label: 'Messages', icon: 'pi pi-comment', to: '/messages' },
-  { label: 'Groups', icon: 'pi pi-th-large', to: '/groups' },
-  { label: 'Settings', icon: 'pi pi-cog', to: '/settings' },
+  { label: 'News Feed', icon: 'pi-home', to: '/' },
+  { label: 'Friends', icon: 'pi-users', to: '/friends' },
+  { label: 'Videos', icon: 'pi-video', to: '/videos' },
+  { label: 'Messages', icon: 'pi-comment', to: '/messages' },
+  { label: 'Groups', icon: 'pi-th-large', to: '/groups' },
+  { label: 'Settings', icon: 'pi-cog', to: '/settings' },
 ]
 
 const router = useRouter()

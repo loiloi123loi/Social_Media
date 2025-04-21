@@ -30,6 +30,11 @@
         />
         <Button label="Login" type="submit" />
       </form>
+
+      <div class="separator">
+        <span>OR</span>
+      </div>
+
       <p class="switch-message">
         New here? <RouterLink to="/register" class="switch-link">Create an account</RouterLink>
       </p>
@@ -173,6 +178,26 @@ h1 {
   margin-bottom: 2rem;
   color: var(--color-text);
   font-size: 1rem;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.separator span {
+  padding: 0 0.75rem;
+  color: var(--color-text-light);
+  font-size: 0.9rem;
 }
 
 .switch-message {

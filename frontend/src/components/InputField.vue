@@ -99,6 +99,7 @@ defineExpose({ focus })
 <style scoped>
 .form-group {
   text-align: left;
+  width: 100%;
 }
 
 label {
