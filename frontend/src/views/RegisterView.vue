@@ -54,6 +54,13 @@
         />
         <Button label="Register" type="submit" />
       </form>
+
+      <div class="separator">
+        <span>OR</span>
+      </div>
+
+      <GoogleLoginButton label="Sign up with Google" />
+
       <p class="switch-message">
         Already have an account? <RouterLink to="/login" class="switch-link">Login here</RouterLink>
       </p>
@@ -64,6 +71,7 @@
 <script setup lang="ts">
 import type { IRegisterRequestData } from '@/api/auth'
 import Button from '@/components/Button.vue'
+import GoogleLoginButton from '@/components/GoogleLoginButton.vue'
 import InputField from '@/components/InputField.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'primevue/usetoast'
@@ -220,6 +228,26 @@ h1 {
   margin-bottom: 2rem;
   color: var(--color-text);
   font-size: 1rem;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.separator span {
+  padding: 0 0.75rem;
+  color: var(--color-text-light);
+  font-size: 0.9rem;
 }
 
 .switch-message {
