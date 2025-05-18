@@ -46,6 +46,8 @@ const navigateTo = (path: string) => {
   flex-direction: column;
   gap: 1rem;
   height: 100vh;
+  backdrop-filter: blur(10px);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
