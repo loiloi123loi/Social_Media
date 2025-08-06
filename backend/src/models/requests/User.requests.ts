@@ -12,3 +12,11 @@ export interface LoginUserReqBody {
 export interface RefreshTokenReqBody {
   refreshToken: string
 }
+
+export interface AddFriendRequestReqBody {
+  followedUserId: string
+}
+
+export interface DeclineFriendRequestReqBody {
+  followedUserId: string
+}

@@ -20,12 +20,26 @@ const USERS_MESSAGES = {
   ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
   ACCESS_TOKEN_MUST_BE_A_STRING: 'Access token must be a string',
   ACCESS_TOKEN_IS_INVALID: 'Access token is invalid',
-  USER_NOT_VERIFIED: 'User not verified'
+  ACCESS_TOKEN_IS_EXPIRED: 'Access token is expired',
+  USER_NOT_VERIFIED: 'User not verified',
+  GET_FRIENDS_SUCCESS: 'Get friends successfully',
+  GET_FRIEND_REQUESTS_SUCCESS: 'Get friend requests successfully',
+  ADD_FRIEND_REQUEST_SUCCESS: 'Add friend request successfully',
+  ACCEPT_FRIEND_REQUEST_SUCCESS: 'Accept friend request successfully',
+  DECLINE_FRIEND_REQUEST_SUCCESS: 'Decline friend request successfully',
+  REMOVE_FRIEND_SUCCESS: 'Remove friend successfully',
+  GET_RECOMMEND_FRIENDS_SUCCESS: 'Get recommended friends successfully',
+  CANNOT_FOLLOW_YOURSELF: 'Cannot follow yourself',
+  FOLLOWED_USER_ID_IS_REQUIRED: 'Followed user ID is required',
+  FOLLOWED_USER_ID_IS_INVALID: 'Followed user ID is invalid',
+  REQUEST_ID_IS_REQUIRED: 'Request ID is required',
+  REQUEST_ID_IS_INVALID: 'Request ID is invalid'
 } as const
 
 const COMMONS_MESSAGES = {
   LIMIT_INVALID: 'Limit must be an integer greater than 0',
-  PAGE_INVALID: 'Page must be an integer greater than 0'
+  PAGE_INVALID: 'Page must be an integer greater than 0',
+  VALIDATION_ERROR: 'Validation error'
 }
 
 const POSTS_MESSAGES = {

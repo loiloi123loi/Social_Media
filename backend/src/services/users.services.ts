@@ -126,6 +126,127 @@ class UserService {
       refreshToken
     }
   }
+
+  async getFriends({ userId }: { userId: string }) {
+    const [{ friends, total }] = await databaseService.followers
+      .aggregate(
+        [
+          {
+            $match: {
+              userId: new ObjectId(userId)
+            }
+          },
+          {
+            $lookup: {
+              from: 'followers',
+              let: {
+                followedId: '$followedUserId',
+                currentId: '$userId'
+              },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        {
+                          $eq: ['$userId', '$$followedId']
+                        },
+                        {
+                          $eq: ['$followedUserId', '$$currentId']
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              as: 'followBack'
+            }
+          },
+          { $match: { followBack: { $ne: [] } } },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'followedUserId',
+              foreignField: '_id',
+              as: 'user'
+            }
+          },
+          { $unwind: '$user' },
+          {
+            $project: {
+              _id: '$followedUserId',
+              friendAt: '$createdAt',
+              name: '$user.name',
+              verifyStatus: '$user.verifyStatus',
+              createdAt: '$user.createdAt'
+            }
+          },
+          {
+            $facet: {
+              total: [{ $count: 'count' }],
+              friends: [{ $skip: 0 }, { $limit: 1 }]
+            }
+          },
+          {
+            $project: {
+              total: {
+                $ifNull: [{ $arrayElemAt: ['$total.count', 0] }, 0]
+              },
+              friends: 1
+            }
+          }
+        ],
+        { maxTimeMS: 60000, allowDiskUse: true }
+      )
+      .toArray()
+
+    return {
+      friends,
+      total
+    }
+  }
+
+  async getFriendRequests({ userId }: { userId: string }) {
+    return {
+      requests: []
+    }
+  }
+
+  async addFriendRequest({ userId, followedUserId }: { userId: string; followedUserId: string }) {
+    const result = await databaseService.followers.findOneAndUpdate(
+      {
+        userId: new ObjectId(userId),
+        followedUserId: new ObjectId(followedUserId)
+      },
+      {
+        $setOnInsert: {
+          userId: new ObjectId(userId),
+          followedUserId: new ObjectId(followedUserId),
+          createdAt: new Date()
+        }
+      },
+      {
+        upsert: true,
+        returnDocument: 'after'
+      }
+    )
+
+    return {
+      request: result
+    }
+  }
+
+  async declineFriendRequest({ userId, followedUserId }: { userId: string; followedUserId: string }) {
+    return {
+      requests: []
+    }
+  }
+
+  async getRecommendFriends({ userId }: { userId: string }) {
+    return {
+      recommendedFriends: []
+    }
+  }
 }
 
 const userService = new UserService()

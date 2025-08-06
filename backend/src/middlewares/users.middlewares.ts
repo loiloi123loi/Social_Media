@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { checkSchema } from 'express-validator'
+import jwt from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import { TOKEN_TYPE, USER_VERIFY_STATUS } from '~/constants/enum'
 import HTTP_STATUS from '~/constants/httpStatus'
@@ -188,7 +189,10 @@ export const accessTokenValidator = validate(
               const { userId, tokenType } = tokenPayload
 
               if (tokenType !== TOKEN_TYPE.ACCESS_TOKEN) {
-                throw new Error(USERS_MESSAGES.ACCESS_TOKEN_IS_INVALID)
+                throw new ErrorWithStatus({
+                  message: USERS_MESSAGES.ACCESS_TOKEN_IS_INVALID,
+                  status: HTTP_STATUS.UNAUTHORIZED
+                })
               }
 
               const user = await databaseService.users.findOne({
@@ -196,15 +200,26 @@ export const accessTokenValidator = validate(
               })
 
               if (!user) {
-                throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+                throw new ErrorWithStatus({
+                  message: USERS_MESSAGES.USER_NOT_FOUND,
+                  status: HTTP_STATUS.UNAUTHORIZED
+                })
               }
 
               req.user = user
               req.decodedAccessToken = tokenPayload
               return true
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
-              throw new Error(USERS_MESSAGES.ACCESS_TOKEN_IS_INVALID)
+              if (error instanceof jwt.TokenExpiredError) {
+                throw new ErrorWithStatus({
+                  message: USERS_MESSAGES.ACCESS_TOKEN_IS_EXPIRED,
+                  status: HTTP_STATUS.UNAUTHORIZED
+                })
+              }
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.ACCESS_TOKEN_IS_INVALID,
+                status: HTTP_STATUS.UNAUTHORIZED
+              })
             }
           }
         }
@@ -226,3 +241,31 @@ export const verifiedUserValidator = (req: Request, res: Response, next: NextFun
   }
   next()
 }
+
+export const followUserValidator = validate(
+  checkSchema(
+    {
+      followedUserId: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.FOLLOWED_USER_ID_IS_REQUIRED
+        },
+        custom: {
+          options: async (value, { req }) => {
+            if (req.user?._id.toString() === value) {
+              throw new Error(USERS_MESSAGES.CANNOT_FOLLOW_YOURSELF)
+            }
+            if (!ObjectId.isValid(value)) {
+              throw new Error(USERS_MESSAGES.FOLLOWED_USER_ID_IS_INVALID)
+            }
+            const isExist = await databaseService.users.findOne({ _id: new ObjectId(value) })
+            if (!isExist) {
+              throw new Error(USERS_MESSAGES.FOLLOWED_USER_ID_IS_INVALID)
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
